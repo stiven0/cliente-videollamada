@@ -1,0 +1,45 @@
+
+<div class="container_principal animated fadeIn fast">
+
+  <aside class="sidebar">
+
+    <h4>Usuarios conectados</h4>
+    <ul *ngIf="usuariosConectadosVideollamada">
+      <li *ngFor="let usuario of usuariosConectadosVideollamada">
+        <i class="fas fa-circle icon_connect"></i>{{ usuario.name | modifyName }}
+      </li>
+    </ul>
+
+  </aside>
+
+  <section class="videollamada_section">
+
+    <div>
+      <video id="player" autoplay *ngIf="camaraAbierta"></video>
+      <img src="assets/noimage.png" alt="noimage" height="200" *ngIf="!camaraAbierta">
+
+      <section class="spinner" *ngIf="spinner">
+        <mat-spinner color="accent"></mat-spinner>
+      </section>
+
+      <button *ngIf="!camaraAbierta" mat-raised-button color="primary" (click)="abrirCamara()">
+        <i class="fa fa-camera"></i>
+        Abrir camara
+      </button>
+
+      <button *ngIf="camaraAbierta" mat-raised-button color="warn" (click)="pararCamara()">
+        <i class="fas fa-stop-circle"></i>
+        Parar camara y salir
+      </button>
+
+
+      <img id="stream-user">
+    </div>
+
+
+
+
+  </section>
+
+
+</div>

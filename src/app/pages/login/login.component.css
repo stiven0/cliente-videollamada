@@ -1,0 +1,48 @@
+
+
+  .div_name {
+    width: 35%;
+    box-shadow: 0 1px 6px 0 rgba(32,33,36,.28);
+    margin: 50px auto;
+    padding: 50px 0px;
+  }
+
+  button {
+    display: block;
+    width: 50%;
+    margin: 20px auto;
+    line-height: 38px;
+  }
+
+  .mat-form-field {
+    width: 50%;
+    display: block;
+    margin: 10px auto;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  .bloqueado {
+    cursor: no-drop;
+    background-color: rgba(116, 133, 222, 0.4);
+  }
+
+  .habilitado {
+    cursor: pointer;
+  }
+
+  /* diseño responsive */
+  @media screen and (max-width: 760px){
+    .div_name {
+      width: 80%;
+      border-radius: 10px;
+    }
+
+    .mat-form-field {
+      width: 65%;
+    }
+
+    button {
+      width: 65%;
+    }
+  }

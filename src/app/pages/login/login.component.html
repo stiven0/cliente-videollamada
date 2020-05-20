@@ -1,0 +1,23 @@
+
+<mat-toolbar color="primary" class="animated fadeIn fast">
+  <mat-toolbar-row>
+    <span>
+      <i class="fas fa-video"></i>
+      VideoChat
+    </span>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+  <div class="div_name animated fadeIn fast">
+
+    <mat-form-field>
+      <input matInput placeholder="Ingresa tu nombre...." #nameInput autocomplete="off">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" [ngClass]="{'bloqueado' : !sockets.socketStatus, 'habilitado' : sockets.socketStatus}"
+    (click)="loginUser(nameInput.value)">
+      Ingresar
+      <i class="fas fa-sign-in-alt"></i>
+    </button>
+
+  </div>

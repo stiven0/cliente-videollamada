@@ -1,0 +1,89 @@
+
+
+.container_principal {
+  height: 656px;
+}
+
+.spinner {
+  width: 100%;
+  margin: 20px 0px;
+}
+
+.spinner .mat-spinner {
+  margin: auto;
+}
+
+.sidebar {
+  width: 100%;
+  height: 100%;
+  background-color: #3F51B5;
+  box-shadow: 0 1px 6px 0 #555;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar h4 {
+  margin-bottom: 25px;
+  color: rgb(254, 254, 254);
+}
+
+.sidebar ul li {
+  list-style: none;
+  margin-bottom: 10px;
+}
+
+.icon_connect {
+  font-size: 10px;
+  margin-right: 6px;
+  color: rgb(93, 200, 55);
+}
+
+.videollamada_section {
+  padding-top: 10px;
+}
+
+.videollamada_section div {
+  box-shadow: 0 1px 6px 0 #555;
+  width: 50%;
+  margin: auto;
+  text-align: center;
+}
+
+.videollamada_section div button {
+  display: block;
+  width: 100%;
+  margin: auto;
+}
+
+.videollamada_section div video {
+  height: 50%;
+  width: 50%;
+}
+
+#stream-user {
+  margin-top: 10px;
+}
+
+
+/* css grid */
+.container_principal {
+  display: grid;
+  grid-template-columns: 20% 80%;
+}
+
+
+/* diseño responsive */
+@media screen and (max-width: 760px) {
+  .container_principal {
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: 20% 80%;
+  }
+
+  .videollamada_section div {
+    width: 80%;
+  }
+
+
+
+
+}
