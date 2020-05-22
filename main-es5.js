@@ -418,49 +418,61 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     /* harmony import */
 
 
-    var sweetalert2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(
+    var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(
+    /*! rxjs/operators */
+    "./node_modules/rxjs/_esm2015/operators/index.js");
+    /* harmony import */
+
+
+    var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(
+    /*! rxjs */
+    "./node_modules/rxjs/_esm2015/index.js");
+    /* harmony import */
+
+
+    var sweetalert2__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
     /*! sweetalert2 */
     "./node_modules/sweetalert2/dist/sweetalert2.all.js");
     /* harmony import */
 
 
-    var sweetalert2__WEBPACK_IMPORTED_MODULE_2___default =
+    var sweetalert2__WEBPACK_IMPORTED_MODULE_4___default =
     /*#__PURE__*/
-    __webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_2__);
+    __webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_4__);
     /* harmony import */
 
 
-    var _services_sockets_status_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(
+    var _services_sockets_status_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(
     /*! @services/sockets-status.service */
     "./src/app/services/sockets-status.service.ts");
     /* harmony import */
 
 
-    var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
+    var _angular_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(
     /*! @angular/router */
     "./node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
     /* harmony import */
 
 
-    var _angular_common__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(
+    var _angular_common__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(
     /*! @angular/common */
     "./node_modules/@angular/common/__ivy_ngcc__/fesm2015/common.js");
     /* harmony import */
 
 
-    var _angular_material_progress_spinner__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(
+    var _angular_material_progress_spinner__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(
     /*! @angular/material/progress-spinner */
     "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/progress-spinner.js");
     /* harmony import */
 
 
-    var _angular_material_button__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(
+    var _angular_material_button__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(
     /*! @angular/material/button */
     "./node_modules/@angular/material/__ivy_ngcc__/fesm2015/button.js");
     /* harmony import */
 
 
-    var _pipes_modify_name_pipe__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(
+    var _pipes_modify_name_pipe__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(
     /*! ../../pipes/modify-name.pipe */
     "./src/app/pipes/modify-name.pipe.ts");
 
@@ -580,6 +592,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.router = router;
         this.camaraAbierta = false;
         this.spinner = false;
+        this._destroyed$ = new rxjs__WEBPACK_IMPORTED_MODULE_3__["Subject"]();
       }
 
       _createClass(LlamadaComponent, [{
@@ -588,6 +601,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.obtenerUsuariosVideollamada();
           this.getUsuariosConnect();
           this.obtenerStreamUsuario();
+        }
+      }, {
+        key: "ngOnDestroy",
+        value: function ngOnDestroy() {
+          this._destroyed$.next();
+
+          this._destroyed$.complete();
         }
       }, {
         key: "obtenerUsuariosVideollamada",
@@ -614,7 +634,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               regeneratorRuntime.mark(function _callee2() {
                 var _this2 = this;
 
-                var videoObject;
+                var videoObject, canvas, context;
                 return regeneratorRuntime.wrap(function _callee2$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -622,7 +642,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                         videoObject = document.getElementsByTagName('video');
                         videoObject[0].srcObject = stream;
                         this.streamVivo = stream;
-                        this.spinner = false;
+                        this.spinner = false; // creamos el canvas
+
+                        canvas = document.createElement('canvas');
+                        canvas.setAttribute('width', '280');
+                        canvas.setAttribute('height', '280');
+                        context = canvas.getContext('2d');
                         this.interval = setInterval(function () {
                           return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(_this2, void 0, void 0,
                           /*#__PURE__*/
@@ -634,7 +659,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                   case 0:
                                     _context.prev = 0;
                                     _context.next = 3;
-                                    return this.capturarFotoUser(videoObject[0]);
+                                    return this.capturarFotoUser(videoObject[0], canvas, context);
 
                                   case 3:
                                     image = _context.sent;
@@ -642,26 +667,41 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
                                     this.socketsService.emitMessage('stream-data', {
                                       imagen: image
                                     });
-                                    _context.next = 12;
+                                    _context.next = 16;
                                     break;
 
                                   case 7:
                                     _context.prev = 7;
                                     _context.t0 = _context["catch"](0);
                                     clearInterval(this.interval);
+
+                                    if (this.streamVivo) {
+                                      this.streamVivo.getTracks()[0].stop();
+                                      this.streamVivo.getTracks()[1].stop();
+                                    }
+
                                     this.spinner = false;
                                     console.log('Error en stream de usuario', _context.t0);
+                                    console.log(_context.t0.message);
 
-                                  case 12:
+                                    if (_context.t0 == 'TypeError') {
+                                      console.log('Yes');
+                                    }
+
+                                    if (_context.t0.TypeError) {
+                                      console.log('Yes 2');
+                                    }
+
+                                  case 16:
                                   case "end":
                                     return _context.stop();
                                 }
                               }
                             }, _callee, this, [[0, 7]]);
                           }));
-                        }, 70);
+                        }, 100);
 
-                      case 5:
+                      case 9:
                       case "end":
                         return _context2.stop();
                     }
@@ -674,7 +714,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               _this.camaraAbierta = false;
 
               if (err.message == 'Permission denied') {
-                sweetalert2__WEBPACK_IMPORTED_MODULE_2___default.a.fire({
+                sweetalert2__WEBPACK_IMPORTED_MODULE_4___default.a.fire({
                   icon: 'info',
                   title: 'Para acceder a la videollamada debes permitir la utilizacion de la camara y audio'
                 });
@@ -683,7 +723,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               ;
 
               if (err.message == 'Could not start video source') {
-                sweetalert2__WEBPACK_IMPORTED_MODULE_2___default.a.fire({
+                sweetalert2__WEBPACK_IMPORTED_MODULE_4___default.a.fire({
                   icon: 'info',
                   title: 'Existe un problema con tu camara'
                 });
@@ -710,16 +750,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: function getUsuariosConnect() {
           var _this3 = this;
 
-          this.socketsService.listenServidorObtenerUsuarios().subscribe(function (data) {
+          this.socketsService.listenServidorObtenerUsuarios().pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["takeUntil"])(this._destroyed$)).subscribe(function (data) {
             if (data.users) _this3.usuariosConectadosVideollamada = data.users;else _this3.usuariosConectadosVideollamada = data;
+
+            if (_this3.streamVivo) {
+              _this3.streamVivo.getTracks()[0].stop();
+
+              _this3.streamVivo.getTracks()[1].stop();
+            }
+
             var imageUserHTML = document.getElementById('stream-user');
 
             if (imageUserHTML && imageUserHTML.src) {
-              imageUserHTML.src = '';
+              console.log(imageUserHTML);
+              imageUserHTML.src = 'assets/noimage.png';
             }
 
             if (data.userExit && localStorage.getItem('user')) {
-              sweetalert2__WEBPACK_IMPORTED_MODULE_2___default.a.fire({
+              sweetalert2__WEBPACK_IMPORTED_MODULE_4___default.a.fire({
                 title: "".concat(data.userExit, " ha salido de la sesion"),
                 icon: 'info'
               });
@@ -730,22 +778,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         key: "obtenerStreamUsuario",
         value: function obtenerStreamUsuario() {
           var imageUserHTML = document.getElementById('stream-user');
-          this.socketsService.listenStreamUsuario().subscribe(function (imagen) {
+          this.socketsService.listenStreamUsuario().pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["takeUntil"])(this._destroyed$)).subscribe(function (imagen) {
             imageUserHTML.src = imagen;
           });
         }
       }, {
         key: "capturarFotoUser",
-        value: function capturarFotoUser(htmlTag) {
-          var canvas = document.createElement('canvas');
-          canvas.setAttribute('width', '280');
-          canvas.setAttribute('height', '280');
-          var context = canvas.getContext('2d');
-          context.drawImage(htmlTag, 0, 0, canvas.width, canvas.height);
-          var foto = context.canvas.toDataURL();
-          canvas = null;
-          context = null;
-          return Promise.resolve(foto);
+        value: function capturarFotoUser(htmlTag, canvas, context) {
+          if (htmlTag) {
+            context.drawImage(htmlTag, 0, 0, canvas.width, canvas.height);
+            var foto = context.canvas.toDataURL();
+            return Promise.resolve(foto);
+          }
         }
       }]);
 
@@ -753,7 +797,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }();
 
     LlamadaComponent.ɵfac = function LlamadaComponent_Factory(t) {
-      return new (t || LlamadaComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_services_sockets_status_service__WEBPACK_IMPORTED_MODULE_3__["SocketsStatusService"]), _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_4__["Router"]));
+      return new (t || LlamadaComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_services_sockets_status_service__WEBPACK_IMPORTED_MODULE_5__["SocketsStatusService"]), _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdirectiveInject"](_angular_router__WEBPACK_IMPORTED_MODULE_6__["Router"]));
     };
 
     LlamadaComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdefineComponent"]({
@@ -761,7 +805,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       selectors: [["app-llamada"]],
       decls: 13,
       vars: 6,
-      consts: [[1, "container_principal", "animated", "fadeIn", "fast"], [1, "sidebar"], [4, "ngIf"], [1, "videollamada_section"], ["id", "player", "autoplay", "", 4, "ngIf"], ["src", "assets/noimage.png", "alt", "noimage", "height", "200", 4, "ngIf"], ["class", "spinner", 4, "ngIf"], ["mat-raised-button", "", "color", "primary", 3, "click", 4, "ngIf"], ["mat-raised-button", "", "color", "warn", 3, "click", 4, "ngIf"], ["id", "stream-user"], [4, "ngFor", "ngForOf"], [1, "fas", "fa-circle", "icon_connect"], ["id", "player", "autoplay", ""], ["src", "assets/noimage.png", "alt", "noimage", "height", "200"], [1, "spinner"], ["color", "accent"], ["mat-raised-button", "", "color", "primary", 3, "click"], [1, "fa", "fa-camera"], ["mat-raised-button", "", "color", "warn", 3, "click"], [1, "fas", "fa-stop-circle"]],
+      consts: [[1, "container_principal", "animated", "fadeIn", "fast"], [1, "sidebar"], [4, "ngIf"], [1, "videollamada_section"], ["id", "player", "controls", "", "autoplay", "", 4, "ngIf"], ["src", "assets/noimage.png", "alt", "noimage", "height", "200", 4, "ngIf"], ["class", "spinner", 4, "ngIf"], ["mat-raised-button", "", "color", "primary", 3, "click", 4, "ngIf"], ["mat-raised-button", "", "color", "warn", 3, "click", 4, "ngIf"], ["id", "stream-user"], [4, "ngFor", "ngForOf"], [1, "fas", "fa-circle", "icon_connect"], ["id", "player", "controls", "", "autoplay", ""], ["src", "assets/noimage.png", "alt", "noimage", "height", "200"], [1, "spinner"], ["color", "accent"], ["mat-raised-button", "", "color", "primary", 3, "click"], [1, "fa", "fa-camera"], ["mat-raised-button", "", "color", "warn", 3, "click"], [1, "fas", "fa-stop-circle"]],
       template: function LlamadaComponent_Template(rf, ctx) {
         if (rf & 1) {
           _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵelementStart"](0, "div", 0);
@@ -827,8 +871,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵproperty"]("ngIf", ctx.camaraAbierta);
         }
       },
-      directives: [_angular_common__WEBPACK_IMPORTED_MODULE_5__["NgIf"], _angular_common__WEBPACK_IMPORTED_MODULE_5__["NgForOf"], _angular_material_progress_spinner__WEBPACK_IMPORTED_MODULE_6__["MatSpinner"], _angular_material_button__WEBPACK_IMPORTED_MODULE_7__["MatButton"]],
-      pipes: [_pipes_modify_name_pipe__WEBPACK_IMPORTED_MODULE_8__["ModifyNamePipe"]],
+      directives: [_angular_common__WEBPACK_IMPORTED_MODULE_7__["NgIf"], _angular_common__WEBPACK_IMPORTED_MODULE_7__["NgForOf"], _angular_material_progress_spinner__WEBPACK_IMPORTED_MODULE_8__["MatSpinner"], _angular_material_button__WEBPACK_IMPORTED_MODULE_9__["MatButton"]],
+      pipes: [_pipes_modify_name_pipe__WEBPACK_IMPORTED_MODULE_10__["ModifyNamePipe"]],
       styles: [".container_principal[_ngcontent-%COMP%] {\r\n  height: 656px;\r\n}\r\n\r\n.spinner[_ngcontent-%COMP%] {\r\n  width: 100%;\r\n  margin: 20px 0px;\r\n}\r\n\r\n.spinner[_ngcontent-%COMP%]   .mat-spinner[_ngcontent-%COMP%] {\r\n  margin: auto;\r\n}\r\n\r\n.sidebar[_ngcontent-%COMP%] {\r\n  width: 100%;\r\n  height: 100%;\r\n  background-color: #3F51B5;\r\n  box-shadow: 0 1px 6px 0 #555;\r\n  padding: 20px;\r\n  box-sizing: border-box;\r\n}\r\n\r\n.sidebar[_ngcontent-%COMP%]   h4[_ngcontent-%COMP%] {\r\n  margin-bottom: 25px;\r\n  color: rgb(254, 254, 254);\r\n}\r\n\r\n.sidebar[_ngcontent-%COMP%]   ul[_ngcontent-%COMP%]   li[_ngcontent-%COMP%] {\r\n  list-style: none;\r\n  margin-bottom: 10px;\r\n}\r\n\r\n.icon_connect[_ngcontent-%COMP%] {\r\n  font-size: 10px;\r\n  margin-right: 6px;\r\n  color: rgb(93, 200, 55);\r\n}\r\n\r\n.videollamada_section[_ngcontent-%COMP%] {\r\n  padding-top: 10px;\r\n}\r\n\r\n.videollamada_section[_ngcontent-%COMP%]   div[_ngcontent-%COMP%] {\r\n  box-shadow: 0 1px 6px 0 #555;\r\n  width: 50%;\r\n  margin: auto;\r\n  text-align: center;\r\n}\r\n\r\n.videollamada_section[_ngcontent-%COMP%]   div[_ngcontent-%COMP%]   button[_ngcontent-%COMP%] {\r\n  display: block;\r\n  width: 100%;\r\n  margin: auto;\r\n}\r\n\r\n.videollamada_section[_ngcontent-%COMP%]   div[_ngcontent-%COMP%]   video[_ngcontent-%COMP%] {\r\n  height: 50%;\r\n  width: 50%;\r\n}\r\n\r\n#stream-user[_ngcontent-%COMP%] {\r\n  margin-top: 10px;\r\n}\r\n\r\n\r\n\r\n.container_principal[_ngcontent-%COMP%] {\r\n  display: grid;\r\n  grid-template-columns: 20% 80%;\r\n}\r\n\r\n\r\n\r\n@media screen and (max-width: 760px) {\r\n  .container_principal[_ngcontent-%COMP%] {\r\n    grid-template-columns: repeat(1, 1fr);\r\n    grid-template-rows: 20% 80%;\r\n  }\r\n\r\n  .videollamada_section[_ngcontent-%COMP%]   div[_ngcontent-%COMP%] {\r\n    width: 80%;\r\n  }\r\n\r\n\r\n\r\n\r\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvcGFnZXMvbGxhbWFkYS9sbGFtYWRhLmNvbXBvbmVudC5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLFdBQVc7RUFDWCxnQkFBZ0I7QUFDbEI7O0FBRUE7RUFDRSxZQUFZO0FBQ2Q7O0FBRUE7RUFDRSxXQUFXO0VBQ1gsWUFBWTtFQUNaLHlCQUF5QjtFQUN6Qiw0QkFBNEI7RUFDNUIsYUFBYTtFQUNiLHNCQUFzQjtBQUN4Qjs7QUFFQTtFQUNFLG1CQUFtQjtFQUNuQix5QkFBeUI7QUFDM0I7O0FBRUE7RUFDRSxnQkFBZ0I7RUFDaEIsbUJBQW1CO0FBQ3JCOztBQUVBO0VBQ0UsZUFBZTtFQUNmLGlCQUFpQjtFQUNqQix1QkFBdUI7QUFDekI7O0FBRUE7RUFDRSxpQkFBaUI7QUFDbkI7O0FBRUE7RUFDRSw0QkFBNEI7RUFDNUIsVUFBVTtFQUNWLFlBQVk7RUFDWixrQkFBa0I7QUFDcEI7O0FBRUE7RUFDRSxjQUFjO0VBQ2QsV0FBVztFQUNYLFlBQVk7QUFDZDs7QUFFQTtFQUNFLFdBQVc7RUFDWCxVQUFVO0FBQ1o7O0FBRUE7RUFDRSxnQkFBZ0I7QUFDbEI7O0FBR0EsYUFBYTs7QUFDYjtFQUNFLGFBQWE7RUFDYiw4QkFBOEI7QUFDaEM7O0FBR0Esc0JBQXNCOztBQUN0QjtFQUNFO0lBQ0UscUNBQXFDO0lBQ3JDLDJCQUEyQjtFQUM3Qjs7RUFFQTtJQUNFLFVBQVU7RUFDWjs7Ozs7QUFLRiIsImZpbGUiOiJzcmMvYXBwL3BhZ2VzL2xsYW1hZGEvbGxhbWFkYS5jb21wb25lbnQuY3NzIiwic291cmNlc0NvbnRlbnQiOlsiXHJcblxyXG4uY29udGFpbmVyX3ByaW5jaXBhbCB7XHJcbiAgaGVpZ2h0OiA2NTZweDtcclxufVxyXG5cclxuLnNwaW5uZXIge1xyXG4gIHdpZHRoOiAxMDAlO1xyXG4gIG1hcmdpbjogMjBweCAwcHg7XHJcbn1cclxuXHJcbi5zcGlubmVyIC5tYXQtc3Bpbm5lciB7XHJcbiAgbWFyZ2luOiBhdXRvO1xyXG59XHJcblxyXG4uc2lkZWJhciB7XHJcbiAgd2lkdGg6IDEwMCU7XHJcbiAgaGVpZ2h0OiAxMDAlO1xyXG4gIGJhY2tncm91bmQtY29sb3I6ICMzRjUxQjU7XHJcbiAgYm94LXNoYWRvdzogMCAxcHggNnB4IDAgIzU1NTtcclxuICBwYWRkaW5nOiAyMHB4O1xyXG4gIGJveC1zaXppbmc6IGJvcmRlci1ib3g7XHJcbn1cclxuXHJcbi5zaWRlYmFyIGg0IHtcclxuICBtYXJnaW4tYm90dG9tOiAyNXB4O1xyXG4gIGNvbG9yOiByZ2IoMjU0LCAyNTQsIDI1NCk7XHJcbn1cclxuXHJcbi5zaWRlYmFyIHVsIGxpIHtcclxuICBsaXN0LXN0eWxlOiBub25lO1xyXG4gIG1hcmdpbi1ib3R0b206IDEwcHg7XHJcbn1cclxuXHJcbi5pY29uX2Nvbm5lY3Qge1xyXG4gIGZvbnQtc2l6ZTogMTBweDtcclxuICBtYXJnaW4tcmlnaHQ6IDZweDtcclxuICBjb2xvcjogcmdiKDkzLCAyMDAsIDU1KTtcclxufVxyXG5cclxuLnZpZGVvbGxhbWFkYV9zZWN0aW9uIHtcclxuICBwYWRkaW5nLXRvcDogMTBweDtcclxufVxyXG5cclxuLnZpZGVvbGxhbWFkYV9zZWN0aW9uIGRpdiB7XHJcbiAgYm94LXNoYWRvdzogMCAxcHggNnB4IDAgIzU1NTtcclxuICB3aWR0aDogNTAlO1xyXG4gIG1hcmdpbjogYXV0bztcclxuICB0ZXh0LWFsaWduOiBjZW50ZXI7XHJcbn1cclxuXHJcbi52aWRlb2xsYW1hZGFfc2VjdGlvbiBkaXYgYnV0dG9uIHtcclxuICBkaXNwbGF5OiBibG9jaztcclxuICB3aWR0aDogMTAwJTtcclxuICBtYXJnaW46IGF1dG87XHJcbn1cclxuXHJcbi52aWRlb2xsYW1hZGFfc2VjdGlvbiBkaXYgdmlkZW8ge1xyXG4gIGhlaWdodDogNTAlO1xyXG4gIHdpZHRoOiA1MCU7XHJcbn1cclxuXHJcbiNzdHJlYW0tdXNlciB7XHJcbiAgbWFyZ2luLXRvcDogMTBweDtcclxufVxyXG5cclxuXHJcbi8qIGNzcyBncmlkICovXHJcbi5jb250YWluZXJfcHJpbmNpcGFsIHtcclxuICBkaXNwbGF5OiBncmlkO1xyXG4gIGdyaWQtdGVtcGxhdGUtY29sdW1uczogMjAlIDgwJTtcclxufVxyXG5cclxuXHJcbi8qIGRpc2XDsW8gcmVzcG9uc2l2ZSAqL1xyXG5AbWVkaWEgc2NyZWVuIGFuZCAobWF4LXdpZHRoOiA3NjBweCkge1xyXG4gIC5jb250YWluZXJfcHJpbmNpcGFsIHtcclxuICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczogcmVwZWF0KDEsIDFmcik7XHJcbiAgICBncmlkLXRlbXBsYXRlLXJvd3M6IDIwJSA4MCU7XHJcbiAgfVxyXG5cclxuICAudmlkZW9sbGFtYWRhX3NlY3Rpb24gZGl2IHtcclxuICAgIHdpZHRoOiA4MCU7XHJcbiAgfVxyXG5cclxuXHJcblxyXG5cclxufVxyXG4iXX0= */"]
     });
     /*@__PURE__*/
@@ -843,9 +887,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }]
       }], function () {
         return [{
-          type: _services_sockets_status_service__WEBPACK_IMPORTED_MODULE_3__["SocketsStatusService"]
+          type: _services_sockets_status_service__WEBPACK_IMPORTED_MODULE_5__["SocketsStatusService"]
         }, {
-          type: _angular_router__WEBPACK_IMPORTED_MODULE_4__["Router"]
+          type: _angular_router__WEBPACK_IMPORTED_MODULE_6__["Router"]
         }];
       }, null);
     })();
@@ -1288,9 +1332,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           var _this5 = this;
 
           this.socket.on('connect', function () {
+            console.log('conectado');
             _this5.socketStatus = true;
           });
           this.socket.on('disconnect', function () {
+            console.log('desconectado');
+
             if (localStorage.getItem('user')) {
               _this5.emitMessage('salir-videollamada', localStorage.getItem('user'));
 
@@ -1381,7 +1428,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var environment = {
       production: false,
-      url: 'https://server-videollamada-app.herokuapp.com/'
+      url: 'http://localhost:3000'
     };
     /*
      * For easier debugging in development mode, you can import the following file
