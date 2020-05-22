@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  url : 'https://server-videollamada-app.herokuapp.com/'
 };

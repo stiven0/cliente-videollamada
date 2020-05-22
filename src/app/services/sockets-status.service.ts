@@ -17,10 +17,12 @@
 
     detectStatusSockets(){
       this.socket.on('connect', () => {
+        console.log('conectado');
         this.socketStatus = true;
       });
 
       this.socket.on('disconnect', () => {
+        console.log('desconectado');
         if(localStorage.getItem('user')){
             this.emitMessage('salir-videollamada', localStorage.getItem('user'));
             localStorage.removeItem('user');

@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SocketsStatusService } from '@services/sockets-status.service';
 import { Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+
 import Swal from 'sweetalert2';
 
 @Component({
@@ -8,12 +11,13 @@ import Swal from 'sweetalert2';
   templateUrl: './llamada.component.html',
   styleUrls: ['./llamada.component.css']
 })
-export class LlamadaComponent implements OnInit {
+export class LlamadaComponent implements OnInit, OnDestroy {
   public usuariosConectadosVideollamada : [{name : string, _id : string}];
   public camaraAbierta : boolean = false;
   public streamVivo : any;
   public interval : any;
   public spinner : boolean = false;
+  private _destroyed$ = new Subject();
 
   constructor(public socketsService : SocketsStatusService, public router : Router) { }
 
@@ -21,6 +25,11 @@ export class LlamadaComponent implements OnInit {
     this.obtenerUsuariosVideollamada();
     this.getUsuariosConnect();
     this.obtenerStreamUsuario();
+  }
+
+  ngOnDestroy(){
+      this._destroyed$.next();
+      this._destroyed$.complete();
   }
 
   obtenerUsuariosVideollamada(){
@@ -40,20 +49,44 @@ export class LlamadaComponent implements OnInit {
                      this.streamVivo = stream;
 
                      this.spinner = false;
+
+                     // creamos el canvas
+                     let canvas = document.createElement('canvas');
+
+                     canvas.setAttribute('width', '280');
+                     canvas.setAttribute('height', '280');
+
+                     let context = canvas.getContext('2d');
+
+
                      this.interval = setInterval(async () => {
                         try {
-                          const image = await this.capturarFotoUser(videoObject[0]);
+                          const image = await this.capturarFotoUser(videoObject[0], canvas, context);
 
                           // emitir stream de datos
                           this.socketsService.emitMessage('stream-data', {imagen : image});
 
                         } catch(err) {
                             clearInterval(this.interval);
+
+                            if(this.streamVivo){
+                              this.streamVivo.getTracks()[0].stop();
+                              this.streamVivo.getTracks()[1].stop();
+                            }
+
                             this.spinner = false;
                             console.log('Error en stream de usuario', err);
+                            console.log(err.message);
+
+                            if(err == 'TypeError'){
+                                console.log('Yes');
+                            }
+                            if(err.TypeError){
+                                console.log('Yes 2');
+                            }
                         }
 
-                      }, 70);
+                      }, 100);
 
                    })
                    .catch((err:Error) => {
@@ -93,15 +126,22 @@ export class LlamadaComponent implements OnInit {
   };
 
   getUsuariosConnect(){
-    this.socketsService.listenServidorObtenerUsuarios().subscribe((
+    this.socketsService.listenServidorObtenerUsuarios().pipe( takeUntil(this._destroyed$) ).subscribe((
       data : {users:[{name : string, _id : string}], userExit : string}) => {
 
       if(data.users) this.usuariosConectadosVideollamada = data.users;
       else (this.usuariosConectadosVideollamada as any) = data;
 
+      if(this.streamVivo){
+        this.streamVivo.getTracks()[0].stop();
+        this.streamVivo.getTracks()[1].stop();
+      }
+
       let imageUserHTML : any = document.getElementById('stream-user');
       if( imageUserHTML && imageUserHTML.src ){
-            imageUserHTML.src = '';
+            console.log(imageUserHTML);
+            imageUserHTML.src = 'assets/noimage.png';
+
       }
 
       if( data.userExit && localStorage.getItem('user') ){
@@ -119,27 +159,19 @@ export class LlamadaComponent implements OnInit {
   obtenerStreamUsuario(){
     let imageUserHTML : any = document.getElementById('stream-user');
 
-    this.socketsService.listenStreamUsuario().subscribe(imagen => {
+    this.socketsService.listenStreamUsuario().pipe( takeUntil(this._destroyed$) ).subscribe(imagen => {
       imageUserHTML.src = imagen;
     });
   };
 
 
-  capturarFotoUser(htmlTag): Promise<string>{
-    let canvas = document.createElement('canvas');
+  capturarFotoUser(htmlTag, canvas, context): Promise<string>{
+    if(htmlTag){
+      context.drawImage(htmlTag, 0, 0, canvas.width, canvas.height);
+      let foto = context.canvas.toDataURL();
 
-    canvas.setAttribute('width', '280');
-    canvas.setAttribute('height', '280');
-
-    let context = canvas.getContext('2d');
-
-    context.drawImage(htmlTag, 0, 0, canvas.width, canvas.height);
-
-    let foto = context.canvas.toDataURL();
-    canvas = null;
-    context = null;
-
-    return Promise.resolve(foto);
+      return Promise.resolve(foto);
+    }
   };
 
 }
