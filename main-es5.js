@@ -1428,7 +1428,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
     var environment = {
       production: false,
-      url: 'http://localhost:3000'
+      url: 'https://server-videollamada-app.herokuapp.com/' // url : 'http://localhost:3000'
+
     };
     /*
      * For easier debugging in development mode, you can import the following file
